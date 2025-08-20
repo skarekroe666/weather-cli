@@ -1,7 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"os"
 
@@ -24,20 +27,35 @@ func main() {
 
 	key, err := loadEnv()
 	if err != nil {
-		panic(err)
+		// panic(err)
+		log.Fatal("could not load .env file:", err)
 	}
 
-	city := "london"
-	url := fmt.Sprintf("https://api.weatherapi.com/v1/current.json?key=%s&q=%s&day=1&aqi=no&alerts=no", key, city)
+	city := "London"
+	url := fmt.Sprintf("https://api.weatherapi.com/v1/current.json?key=%s&q=%s&days=1&aqi=yes&alerts=no", key, city)
+	fmt.Println(url)
 
 	res, err := http.Get(url)
 	if err != nil {
-		panic(err)
+		log.Fatal("could not get the url:", err)
 	}
-	res.Body.Close()
+	defer res.Body.Close()
 
 	if res.StatusCode != 200 {
-		panic("Weathe api not avalaible")
+		body, _ := io.ReadAll(res.Body)
+		log.Fatalf("Weather API not available. Status: %d, Body: %s", res.StatusCode, string(body))
 	}
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Fatal("Empty body, check the link:", err)
+	}
+
+	var weather WeatherInfo
+	err = json.Unmarshal(body, &weather)
+	if err != nil {
+		log.Fatal("failed to unmarshal data:", err)
+	}
+	fmt.Println(weather)
 
 }
