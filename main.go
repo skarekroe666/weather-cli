@@ -33,7 +33,6 @@ func main() {
 
 	city := "London"
 	url := fmt.Sprintf("https://api.weatherapi.com/v1/current.json?key=%s&q=%s&days=1&aqi=yes&alerts=no", key, city)
-	fmt.Println(url)
 
 	res, err := http.Get(url)
 	if err != nil {
@@ -56,6 +55,10 @@ func main() {
 	if err != nil {
 		log.Fatal("failed to unmarshal data:", err)
 	}
-	fmt.Println(weather)
+	// fmt.Println(weather)
 
+	fmt.Printf("%s, %s: %.0fC, %s, %.0f, %d",
+		weather.Location.Name, weather.Location.Country,
+		weather.Current.TempC, weather.Current.Condition.Text,
+		weather.Current.WindKph, weather.Current.Humidity)
 }
