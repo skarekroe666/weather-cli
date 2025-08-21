@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 )
 
@@ -22,9 +23,7 @@ func loadEnv() (string, error) {
 	return key, nil
 }
 
-func main() {
-	fmt.Println("lets start the cli")
-
+func getResp() string {
 	key, err := loadEnv()
 	if err != nil {
 		// panic(err)
@@ -32,7 +31,16 @@ func main() {
 	}
 
 	city := "London"
-	url := fmt.Sprintf("https://api.weatherapi.com/v1/current.json?key=%s&q=%s&days=1&aqi=yes&alerts=no", key, city)
+	if len(os.Args) >= 2 {
+		city = os.Args[1]
+	}
+	return fmt.Sprintf("https://api.weatherapi.com/v1/current.json?key=%s&q=%s&days=1&aqi=yes&alerts=no", key, city)
+}
+
+func main() {
+	fmt.Println("lets start the cli")
+
+	url := getResp()
 
 	res, err := http.Get(url)
 	if err != nil {
@@ -57,8 +65,14 @@ func main() {
 	}
 	// fmt.Println(weather)
 
-	fmt.Printf("%s, %s: %.0fC, %s, %.0f, %d",
+	msg := fmt.Sprintf("%s, %s: %.0fC, %s, Wind: %.0fkmph, Humidity: %d",
 		weather.Location.Name, weather.Location.Country,
 		weather.Current.TempC, weather.Current.Condition.Text,
 		weather.Current.WindKph, weather.Current.Humidity)
+
+	if weather.Current.TempC <= 20 {
+		fmt.Print(msg)
+	} else {
+		color.Red(msg)
+	}
 }
