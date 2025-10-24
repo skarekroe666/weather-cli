@@ -42,18 +42,18 @@ func main() {
 
 	url := getResp()
 
-	res, err := http.Get(url)
+	resp, err := http.Get(url)
 	if err != nil {
 		log.Fatal("could not get the url:", err)
 	}
-	defer res.Body.Close()
+	defer resp.Body.Close()
 
-	if res.StatusCode != 200 {
-		body, _ := io.ReadAll(res.Body)
-		log.Fatalf("Weather API not available. Status: %d, Body: %s", res.StatusCode, string(body))
+	if resp.StatusCode != 200 {
+		body, _ := io.ReadAll(resp.Body)
+		log.Fatalf("Weather API not available. Status: %d, Body: %s", resp.StatusCode, string(body))
 	}
 
-	body, err := io.ReadAll(res.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal("Empty body, check the link:", err)
 	}
@@ -65,7 +65,7 @@ func main() {
 	}
 	// fmt.Println(weather)
 
-	msg := fmt.Sprintf("%s, %s: %.0fC, %s, Wind: %.0fkmph, Humidity: %d",
+	msg := fmt.Sprintf("%s, %s: %.0fC, %s, Wind: %.0fkmph, Humidity: %d\n",
 		weather.Location.Name, weather.Location.Country,
 		weather.Current.TempC, weather.Current.Condition.Text,
 		weather.Current.WindKph, weather.Current.Humidity)
